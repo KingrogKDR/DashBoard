@@ -1,29 +1,37 @@
-import { Geist, Geist_Mono } from "next/font/google";
+"use client";
+
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export const metadata = {
-  title: "Store Doc",
-  description: "A custom storage solution for your documents online",
-  icons: [{ rel: "icon", type: "image/svg", url: "/images/logo.svg" }],
-};
+import { ThemeProvider } from "./providers";
+import Navbar from "../components/Navbar";
+import { SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
+import { AppSidebar } from "../components/Sidebar";
+import { usePathname } from "next/navigation";
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname();
+
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <head />
+      <body className={`antialiased`}>
+        {pathname !== "/login" ? (
+          <>
+            <ThemeProvider>
+              <Navbar />
+              <SidebarProvider>
+                <AppSidebar />
+                <main className="h-screen px-8 py-10">
+                  <SidebarTrigger className="absolute top-5 ml-3" />
+                  {children}
+                </main>
+              </SidebarProvider>
+            </ThemeProvider>
+          </>
+        ) : (
+          <main className="h-screen flex items-center justify-center">
+            {children}
+          </main>
+        )}
       </body>
     </html>
   );
