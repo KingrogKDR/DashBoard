@@ -10,12 +10,6 @@ import { useEffect } from "react";
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-  useEffect(() => {
-    const token = localStorage.getItem("jwt_token");
-    if (!token) {
-      redirect("/login");
-    }
-  }, []);
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
