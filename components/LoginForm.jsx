@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { confirmPassword, createMockJWT } from "../app/services";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const LoginForm = () => {
   const router = useRouter();
