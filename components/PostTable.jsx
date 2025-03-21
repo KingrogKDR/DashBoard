@@ -1,10 +1,12 @@
-// components/PostTable.js
 import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 
 export default function PostTable({ posts }) {
   const [currentPage, setCurrentPage] = useState(1);
   const [mounted, setMounted] = useState(false);
+  const [searchId, setSearchId] = useState('');
+  const [filteredPosts, setFilteredPosts] = useState(posts);
+  const [filterUserId, setFilterUserId] = useState('');
   const { theme } = useTheme();
   const postsPerPage = 5;
   
@@ -12,11 +14,28 @@ export default function PostTable({ posts }) {
     setMounted(true);
   }, []);
   
+  useEffect(() => {
+    let results = posts;
+    
+    if (searchId) {
+      results = results.filter(post => post.id.toString() === searchId.trim());
+    }
+    
+    if (filterUserId) {
+      results = results.filter(post => post.userId.toString() === filterUserId);
+    }
+    
+    setFilteredPosts(results);
+    setCurrentPage(1); 
+  }, [posts, searchId, filterUserId]);
+  
+  const userIds = [...new Set(posts.map(post => post.userId))].sort((a, b) => a - b);
+  
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost);
+  const currentPosts = filteredPosts.slice(indexOfFirstPost, indexOfLastPost);
   
-  const totalPages = Math.ceil(posts.length / postsPerPage);
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
   
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
@@ -25,8 +44,73 @@ export default function PostTable({ posts }) {
   
   const isDarkMode = mounted && theme === 'dark';
   
+  const handleClearFilters = () => {
+    setSearchId('');
+    setFilterUserId('');
+  };
+  
   return (
     <div className="w-full overflow-hidden shadow-md rounded-lg transition-colors">
+      <div className={`p-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'} border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} transition-colors`}>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <label htmlFor="search-id" className={`block text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
+              Search by ID
+            </label>
+            <input
+              type="text"
+              id="search-id"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+              placeholder="Enter post ID"
+              className={`px-3 py-2 w-full border rounded-md text-sm ${
+                isDarkMode 
+                  ? 'bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-700 placeholder-gray-400'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
+            />
+          </div>
+          
+          <div className="flex-1">
+            <label htmlFor="filter-user" className={`block text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-1`}>
+              Filter by User ID
+            </label>
+            <select
+              id="filter-user"
+              value={filterUserId}
+              onChange={(e) => setFilterUserId(e.target.value)}
+              className={`px-3 py-2 w-full border rounded-md text-sm ${
+                isDarkMode 
+                  ? 'bg-gray-700 border-gray-600 text-gray-200'
+                  : 'bg-white border-gray-300 text-gray-700'
+              } focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors`}
+            >
+              <option value="">All Users</option>
+              {userIds.map(userId => (
+                <option key={userId} value={userId}>User {userId}</option>
+              ))}
+            </select>
+          </div>
+          
+          <div className="flex items-end">
+            <button
+              onClick={handleClearFilters}
+              className={`px-3 py-2 border rounded-md text-sm font-medium ${
+                isDarkMode 
+                  ? 'bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600'
+                  : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-200'
+              } transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div className={`px-4 py-2 text-xs ${isDarkMode ? 'bg-gray-800 text-gray-300' : 'bg-white text-gray-700'} transition-colors`}>
+        Showing {filteredPosts.length} {filteredPosts.length === 1 ? 'result' : 'results'}
+      </div>
+
       <div className="overflow-x-auto">
         <table className={`min-w-full text-xs md:text-sm ${isDarkMode ? 'bg-gray-800' : 'bg-white'} transition-colors`}>
           <thead className={`${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-gray-100 border-gray-200'} border-b transition-colors`}>
@@ -88,11 +172,11 @@ export default function PostTable({ posts }) {
           <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
             <div>
               <p className={`text-xs ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors`}>
-                Showing <span className="font-medium">{indexOfFirstPost + 1}</span> to{' '}
+                Showing <span className="font-medium">{filteredPosts.length > 0 ? indexOfFirstPost + 1 : 0}</span> to{' '}
                 <span className="font-medium">
-                  {indexOfLastPost > posts.length ? posts.length : indexOfLastPost}
+                  {indexOfLastPost > filteredPosts.length ? filteredPosts.length : indexOfLastPost}
                 </span>{' '}
-                of <span className="font-medium">{posts.length}</span> results
+                of <span className="font-medium">{filteredPosts.length}</span> results
               </p>
             </div>
             <div>
