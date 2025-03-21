@@ -2,11 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Alert, AlertDescription } from "./ui/alert";
 import { confirmPassword, createMockJWT } from "../app/services";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 
 const LoginForm = () => {
   const router = useRouter();
+  const { theme } = useTheme();
+  const isDarkMode = theme === "dark";
 
   const [formData, setFormData] = useState({
     email: "",
@@ -36,12 +43,12 @@ const LoginForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  
+
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -49,7 +56,6 @@ const LoginForm = () => {
       }));
     }
   };
-  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -83,79 +89,83 @@ const LoginForm = () => {
   }, [isLoggedIn]);
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-background rounded-lg shadow-xl">
+    <Card className="w-full max-w-md mx-auto shadow-lg">
       {isLoggedIn ? (
-        <div className="text-center py-4">
-          <div className="text-green-600 text-xl mb-2">Login Successful!</div>
-          <p className="text-foreground">Welcome back, {formData.email}</p>
-          <Button>Go to Dashboard</Button>
-        </div>
+        <CardContent className="text-center py-6">
+          <div className="text-green-600 dark:text-green-400 text-xl mb-2">
+            Login Successful!
+          </div>
+          <p className="mb-4">Welcome back, {formData.email}</p>
+          <Button onClick={() => router.push("/")}>Go to Dashboard</Button>
+        </CardContent>
       ) : (
         <>
-          <h2 className="text-2xl font-bold mb-6 text-center text-foreground">
-            Login
-          </h2>
-          <div className="w-full text-red-400 text-center py-3 my-4">
-            {errors.confirm}
-          </div>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label
-                className="block text-foreground text-sm font-bold mb-2"
-                htmlFor="email"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="text"
-                placeholder="your@email.com"
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-background text-foreground ${
-                  errors.email
-                    ? "border-red-500 focus:ring-red-200"
-                    : "border-gray-300 focus:ring-blue-200"
-                }`}
-              />
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-              )}
-            </div>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">
+              Login
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {errors.confirm && (
+              <Alert variant="destructive" className="mb-4">
+                <AlertDescription>{errors.confirm}</AlertDescription>
+              </Alert>
+            )}
+            <form onSubmit={handleSubmit}>
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="text"
+                    placeholder="your@email.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={
+                      errors.email
+                        ? "border-red-500 focus-visible:ring-red-500"
+                        : ""
+                    }
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 dark:text-red-400 text-xs">
+                      {errors.email}
+                    </p>
+                  )}
+                </div>
 
-            <div className="mb-6">
-              <label
-                className="block text-foreground text-sm font-bold mb-2"
-                htmlFor="password"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="••••••"
-                value={formData.password}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 bg-background text-foreground ${
-                  errors.password
-                    ? "border-red-500 focus:ring-red-200"
-                    : "border-gray-300 focus:ring-blue-200"
-                }`}
-              />
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-              )}
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={
+                      errors.password
+                        ? "border-red-500 focus-visible:ring-red-500"
+                        : ""
+                    }
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 dark:text-red-400 text-xs">
+                      {errors.password}
+                    </p>
+                  )}
+                </div>
 
-            <Button type="submit" className="w-full">
-              Sign In
-            </Button>
-          </form>
+                <Button type="submit" className="w-full mt-2">
+                  Sign In
+                </Button>
+              </div>
+            </form>
+          </CardContent>
         </>
       )}
-    </div>
+    </Card>
   );
 };
 
