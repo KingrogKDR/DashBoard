@@ -5,12 +5,14 @@ import { ThemeProvider } from "./providers";
 import Navbar from "../components/Navbar";
 import { SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
 import { AppSidebar } from "../components/Sidebar";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
-
+  const token = localStorage.getItem('jwt_token');
+  if(!token) redirect("/login")
   return (
+
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`antialiased`}>

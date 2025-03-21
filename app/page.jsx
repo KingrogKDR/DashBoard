@@ -8,35 +8,26 @@ export default function Home() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem('jwt_token');
-    
-    if (!token) {
-      redirect("/login");
-    } else {
-      setIsAuthenticated(true);
-      
-      fetch("https://jsonplaceholder.typicode.com/posts")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setPosts(data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
-    }
+    fetch("https://jsonplaceholder.typicode.com/posts")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setPosts(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setError(error.message);
+        setLoading(false);
+      });
   }, []);
 
-  if (!isAuthenticated || loading)
+  if (loading)
     return (
       <div className="flex flex-col justify-center items-center p-8">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-r-2 border-blue-500 dark:border-blue-400"></div>
