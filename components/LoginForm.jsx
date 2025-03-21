@@ -8,12 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Alert, AlertDescription } from "./ui/alert";
 import { confirmPassword, createMockJWT } from "../app/services";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 
 const LoginForm = () => {
   const router = useRouter();
-  const { theme } = useTheme();
-  const isDarkMode = theme === "dark";
 
   const [formData, setFormData] = useState({
     email: "",

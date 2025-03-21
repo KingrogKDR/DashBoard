@@ -5,8 +5,7 @@ import { ThemeProvider } from "./providers";
 import Navbar from "../components/Navbar";
 import { SidebarProvider, SidebarTrigger } from "../components/ui/sidebar";
 import { AppSidebar } from "../components/Sidebar";
-import { redirect, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
